@@ -1,6 +1,13 @@
+from microbit import *
+import radio
+
 radio.on()
 radio.config(channel=6)
-Image= "Recul"
+radio.config(power=7)
 
 While True:
-    radio.sent(Image)
+    incoming = radio.receive()
+        if incoming is not None:
+            display.show(incoming)
+            print(incoming)
+        sleep(500)

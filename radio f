@@ -1,0 +1,44 @@
+from microbit import *
+from utime import ticks_us, sleep_us
+import neopixel
+import radio
+
+radio.on()
+radio.config(channel=6)
+radio.config(power=7)
+
+recul1 = Image("99999:"
+             "00000:"
+             "00000:"
+             "00000:"
+             "00000")
+             
+recul2 = Image("99999:"
+             "09990:"
+             "00000:"
+             "00000:"
+             "00000")
+             
+recul3 = Image("99999:"
+             "09990:"
+             "00900:"
+             "00000:"
+             "00000")
+             
+recul4 = Image("99999:"
+             "09990:"
+             "00900:"
+             "00900:"
+             "00000")
+    
+             
+while True:
+    incoming = radio.receive()
+    if incoming == "1":
+        display.show(recul1)
+    elif incoming=="2":
+        display.show(recul2)
+    elif incoming=="3":
+        display.show(recul3)
+    elif incoming=="4":
+        display.show(recul4)

@@ -1,0 +1,128 @@
+from microbit import *
+from utime import ticks_us, sleep_us
+import neopixel
+import radio
+
+np = neopixel.NeoPixel(pin13, 12)
+bright = 40
+
+recul1 = Image("99999:"
+             "00000:"
+             "00000:"
+             "00000:"
+             "00000")
+             
+recul2 = Image("99999:"
+             "09990:"
+             "00000:"
+             "00000:"
+             "00000")
+             
+recul3 = Image("99999:"
+             "09990:"
+             "00900:"
+             "00000:"
+             "00000")
+             
+recul4 = Image("99999:"
+             "09990:"
+             "00900:"
+             "00900:"
+             "00000")
+             
+recul5 = Image("99999:"
+             "09990:"
+             "00900:"
+             "00900:"
+             "00900")
+
+leftA = pin0
+leftB = pin8
+rightA = pin1
+rightB = pin12
+sonar = pin15
+
+gospeed = 60
+
+def getDistance():
+    sonar.write_digital(1)  # Send 10us Ping pulse
+    sleep_us(10)
+    sonar.write_digital(0)
+    while sonar.read_digital() == 0: # ensure Ping pulse has cleared from receiver
+        pass
+    start = ticks_us()  # define starting time
+    while sonar.read_digital() == 1:  # wait for Echo pulse to return
+        pass
+    end = ticks_us()    # define ending time
+    echo = end-start
+    distance = int(0.01715 * echo)  # Calculate cm distance
+    return distance
+
+def forward (speedpct):
+    setAll(0,bright,0)
+    speed = speedpct * 10.23
+    leftA.write_analog(speed)
+    leftB.write_digital(0)
+    rightA.write_analog(speed)
+    rightB.write_digital(0)
+
+def reverse (speedpct):
+    setAll(bright,0,0)
+    speed = speedpct * 10.23
+    leftA.write_analog(1023-speed)
+    leftB.write_digital(1)
+    rightA.write_analog(1023-speed)
+    rightB.write_digital(1)
+
+def spinLeft (speedpct):
+    setAll(0,0,bright)
+    speed = speedpct * 10.23
+    leftA.write_analog(1023-speed)
+    leftB.write_digital(1)
+    rightA.write_analog(speed)
+    rightB.write_digital(0)
+
+def spinRight (speedpct):
+    setAll(bright,0,bright)
+    speed = speedpct * 10.23
+    leftA.write_analog(speed)
+    leftB.write_digital(0)
+    rightA.write_analog(1023-speed)
+    rightB.write_digital(1)
+
+def stop():
+    leftA.write_analog(0)
+    leftB.write_digital(0)
+    rightA.write_analog(0)
+    rightB.write_digital(0)
+
+def setAll(red,green,blue):
+    for idx in range(12):
+        np[idx] = (red,green,blue)
+    np.show()
+radio.on()
+radio.config(channel=6)
+radio.config(power=7)
+
+while True:
+    forward(gospeed)
+    dist = getDistance()
+    if (dist > 20):
+        display.show(recul1)
+        radio.sent("1")
+    elif (dist > 15):
+        display.show(recul2)
+        radio.sent("2")
+    elif (dist > 12):
+        display.show(recul3)
+        radio.sent("3")
+    elif (dist > 11):
+        display.show(recul4)
+        radio.sent("4")
+    if (dist < 10):
+        stop()
+        reverse(gospeed)
+        sleep(800)
+        spinRight(gospeed)
+        sleep(200)
+        forward(gospeed)

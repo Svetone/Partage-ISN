@@ -1,0 +1,6 @@
+radio.on()
+radio.config(channel=6)
+Image= "Recul"
+
+While True:
+    radio.sent(Image)
